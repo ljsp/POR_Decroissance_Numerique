@@ -1,7 +1,3 @@
-# POR_Decroissance_Numerique
-
-
-
 # Décroissance numérique :
 # Quels écosystèmes logiciels pourl’informatique frugale ?
 
