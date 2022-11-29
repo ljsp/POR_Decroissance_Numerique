@@ -1,6 +1,0 @@
-set_robust_list(0x7f34fba5a6a0, 24)     = 0
-newfstatat(1, "", {st_mode=S_IFCHR|0620, st_rdev=makedev(0x88, 0x2), ...}, AT_EMPTY_PATH) = 0
-getpid()                                = 15577
-write(1, "printed from child process 15577"..., 33) = 33
-exit_group(0)                           = ?
-+++ exited with 0 +++
