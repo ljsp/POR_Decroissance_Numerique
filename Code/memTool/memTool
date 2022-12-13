@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 import sys
 import os
-from time import sleep
+import time
 from subprocess import *
 
 # -f file.txt : output information to a file rather than stderr
-# -d          : debug mode
+# -d          : debug mode, prints the logs in prompt
 
 out = sys.stderr
 FILE = False
 DEBUG = False
+TIMER = False
 
 ## Parsing args
 child_args = []
@@ -19,14 +20,15 @@ while i < len(sys.argv):
         i += 1
         out = open(sys.argv[i], 'w')
         FILE = True
+    elif sys.argv[i] == '-t':
+        TIMER = True
     elif sys.argv[i] == '-d':
         DEBUG = True
     else:
         child_args.append(sys.argv[i])
     i += 1
 
-# child_command should be a single argument as if to "/bin/sh -c 'child_command'"
-# when shell=True is enabled
+#Creating child command from the given parameters
 child_command = ' '.join(child_args)
 
 
@@ -36,28 +38,34 @@ def log(msg):
     if FILE:
         out.write("memusg: {} \n".format(msg))
 
+log(child_args)
+
+# Sampling function: executes ps to get the given process memory
 def get_vsize(sid):
     vsize = 0
     proc = Popen(['ps', '-o', 'vsize=', '--sid', str(sid)], stdout=PIPE, stderr=None, shell=False)
     (stdout, _stderr) = proc.communicate()
-    # Iterate over each process within the process tree of our process session
-    # (this ensures that we include processes launched by a child bash script, etc.)
+    # Sum the size of each 
     for line in stdout.split():
         vsize += int(line.strip())
     return vsize
 
-# Create a new process session for this process so that we can
-# easily calculate the memory usage of the whole process tree using ps
-#
-# Since we need a new session using os.setsid(), we must first fork()
+# Parent process infos
 pid = os.getpid()
 sid = os.getsid(pid)
 pgid = os.getpgid(pid)
 log("Pre-fork: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
 
+# Starting time for execution time
+if TIMER:
+    startTime = time.time()
+
+# Creating child process to execute child command
 fork_pid = os.fork()
+
+# We are in the child process
 if fork_pid == 0:
-    # We *are* the new fork (not the original process)
+    # Setting up child process
     pid = os.getpid()
     sid = os.getsid(pid)
     pgid = os.getpgid(pid)
@@ -70,15 +78,15 @@ if fork_pid == 0:
     log("Post-session init: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
         
     log("Starting child: {}".format(child_command))
-    # "None" means "inherit from parent"
     proc = Popen(child_command, stdin=None, stdout=None, stderr=None, env=None, shell=True)
 
+    # Logging peak memory usage 
     vmpeak = -1
     while proc.returncode == None:
         vmpeak = max(get_vsize(sid), vmpeak)
         log("Waiting for child to exit. vmpeak={}".format(vmpeak))
-        proc.poll()
-        sleep(0.1) # Time in seconds (float)
+        proc.poll()     # Check if child process has finished
+        time.sleep(0.1) # Time in seconds (float)
     
     out.write("memusg: vmpeak: {} kb\n".format(vmpeak))
 
@@ -86,11 +94,14 @@ if fork_pid == 0:
     log("Child process returned {}".format(status))
     sys.exit(status)
 
+# We are in parent process
 else:
-    # This is the branch of fork that continues the original process
     # Wait for child process to finish
     (_fork_pid, full_status) = os.waitpid(fork_pid, 0)
     status = full_status >> 8
     log("Fork returned {}".format(status))
+    if TIMER:
+        executionTime = (time.time() - startTime)
+        out.write("Execution time : {} s\n".format(executionTime))
     out.close()
     sys.exit(status)
