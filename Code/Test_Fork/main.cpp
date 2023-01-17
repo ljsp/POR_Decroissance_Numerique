@@ -16,10 +16,10 @@ int main() {
         std::cout << "printed from parent process " << getpid() << std::endl;
         wait(nullptr);
     } else {
-        // Allocation dynamique sur le tas
-        int* alloc = (int*) malloc(1000 * sizeof(int));
-        // Allocation sur la pile
-        int hello = 42;
+        // Allocation dynamique sur le tas 100Mo
+        //int* alloc = (int*) malloc(100 * 1024 * 1024);
+        // Allocation sur la pile de 512Ko
+        char buffer[512 * 1024];
         std::cout << "printed from child process " << getpid() << std::endl;
         exit(EXIT_SUCCESS);
     }
