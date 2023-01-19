@@ -17,9 +17,9 @@ int main() {
         wait(nullptr);
     } else {
         // Allocation dynamique sur le tas 100Mo
-        //int* alloc = (int*) malloc(100 * 1024 * 1024);
-        // Allocation sur la pile de 512Ko
-        char buffer[512 * 1024];
+        int* alloc = (int*) malloc(100 * 1024 * 1024);
+        // Allocation sur la pile de 1Mo
+        char buffer[1 * 1024 * 1024];
         std::cout << "printed from child process " << getpid() << std::endl;
         exit(EXIT_SUCCESS);
     }
