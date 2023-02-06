@@ -30,6 +30,8 @@ int main(int argc, char const *argv[])
 
         if (m < 0 || m > n)
         {
+            delete p;
+            
             return 3;
         }
 
