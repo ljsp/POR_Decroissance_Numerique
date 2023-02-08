@@ -4,7 +4,7 @@
 using namespace std;
 
 static const int NB_ALLOCS = 1000;
-static const int ALLOC_SIZE = 1000000;
+static const int ALLOC_SIZE = 1000;
 
 int main() {
         char ** array_of_arrays = (char**)malloc(NB_ALLOCS * sizeof(char *));
@@ -13,7 +13,7 @@ int main() {
                 array_of_arrays[i] = (char *)malloc(ALLOC_SIZE);
         }
         cout << "Alloc done" << endl;
-        sleep(10);
+        sleep(0.1);
         cout << "Now writting" << endl;
         for (int i = 0; i < NB_ALLOCS; i++)
         {
@@ -22,5 +22,5 @@ int main() {
                 }
         }
         cout << "Done writting" << endl;
-        sleep(10);
+        sleep(0.1);
 }
