@@ -5,15 +5,12 @@ import time
 
 clock = 0
 vss_data = []
-map_data = []
-unmap_data = []
 time_data = []
 
-current_vss = 0 
-total_map = 0
-total_unmap = 0
+current_vss = 0     #
+max_vss = 0
 
-prev_alloc = 0
+prev_brk_alloc = 0
 prev_vss = 0
 prev_time = time.time()
 
@@ -37,13 +34,16 @@ with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
             if match:
                 alloc = int(match.group(2), base=16)
                 if(match.group(1) == "NULL"):
-                    prev_alloc = alloc
+                    prev_brk_alloc = alloc
                 else:
-                    current_vss += alloc - prev_alloc
-                    prev_alloc = alloc
+                    current_vss += alloc - prev_brk_alloc
+                    prev_brk_alloc = alloc
         
         if vss_data:
             prev_vss = vss_data[-1]
+            
+        if current_vss > max_vss:
+            max_vss = current_vss
 
         vss_data.append(prev_vss)
         vss_data.append(current_vss)
@@ -53,11 +53,11 @@ with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
         
         current_time = time.time()
         elapsed_time = current_time - prev_time
-        
         prev_time = current_time
-        clock += current_vss / elapsed_time
+        clock += abs(current_vss - prev_vss) / elapsed_time
         
 # tracé du graphe en utilisant matplotlib
+print("VSS peak : ", max_vss)
 plt.plot(time_data, vss_data, label='VSS')
 plt.xlabel('Temps (en octets/secondes)')
 plt.ylabel('Utilisation de la mémoire (en octets)')

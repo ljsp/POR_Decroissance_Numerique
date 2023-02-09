@@ -4,7 +4,9 @@ if [ "$1" = "memTool" ]; then
 
   g++ Tests/$2.cpp -o compiled_file
 
-  python3 Outils/memTool $2
+  python3 Outils/memTool ./compiled_file
+
+  rm compiled_file
 
 
 elif [ "$1" = "logReader" ]; then
