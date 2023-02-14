@@ -8,7 +8,6 @@ if [ "$1" = "memTool" ]; then
 
   rm compiled_file
 
-
 elif [ "$1" = "logReader" ]; then
 
   g++ Tests/$2.cpp -o compiled_file
