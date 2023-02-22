@@ -8,7 +8,7 @@ int main() {
     char* alloc = (char*) malloc(200 * 1024 * 1024);
 
     // Utilisation de 25 Mo de mémoire 
-    for(int i = 0; i < 125 * 1024 * 1024 ; i++) {
+    for(int i = 0; i < 25 * 1024 * 1024 ; i++) {
         alloc[i] = 'a';
     }
 

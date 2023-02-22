@@ -4,18 +4,9 @@ if [ "$1" = "memTool" ]; then
 
   g++ Tests/$2.cpp -o compiled_file
 
-  python3 Outils/memTool -d -f memTrace.txt ./compiled_file
+  python3 Outils/memTool ./compiled_file
 
   rm compiled_file
-
-elif [ "$1" = "memusg" ]; then
-
-  g++ Tests/$2.cpp -o compiled_file
-
-  python3 Outils/memusg ./compiled_file
-
-  rm compiled_file
-
 
 elif [ "$1" = "logReader" ]; then
 

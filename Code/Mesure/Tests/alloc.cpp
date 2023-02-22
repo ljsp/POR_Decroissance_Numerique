@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <unistd.h>
+
 
 int main() {
     // Allocation de 100Mo de mémoire virtuelle
@@ -12,6 +14,8 @@ int main() {
     for(int i = 0; i < 25 * 1024 ; i++) {
         alloc[i] = 'a';
     }
+
+    sleep(1);
 
     free(alloc);
     }
