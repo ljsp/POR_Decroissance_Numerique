@@ -1,9 +1,8 @@
 #include <iostream>
-#include <vector>
 
 int main() {
-    // Allocation de 1Mo de mémoire virtuelle
 
+    // Allocation de 1Mo de mémoire virtuelle
     char* alloc = (char*) malloc(1 * 1024 * 1024);
 
     // Utilisation de 25 Mo de mémoire 
@@ -11,6 +10,7 @@ int main() {
         alloc[i] = 'a';
     }
 
+    // Libération de la mémoire
     free(alloc);
 
     return 0;

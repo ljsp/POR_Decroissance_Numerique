@@ -31,9 +31,7 @@ while i < len(sys.argv):
         child_args.append(sys.argv[i])
     i += 1
 
-#Creating child command from the given parameters
 #child_command = ' '.join(child_args)
-child_command = child_args
 
 def log(msg):
     if DEBUG:
@@ -44,9 +42,9 @@ def log(msg):
 log(child_args)
 
 #Sampling function using ps
-def get_vsize(sid):
+def get_vsize(pid):
     vsize = 0
-    proc = Popen(['ps', '-o', 'vsize=', '--sid', str(sid)], stdout=PIPE, stderr=None, shell=False)
+    proc = Popen(['ps', '-o', 'vsize=', '--pid', str(pid)], stdout=PIPE, stderr=None, shell=False)
     (stdout, _stderr) = proc.communicate()
     print(stdout)
     print(sid)
@@ -56,7 +54,7 @@ def get_vsize(sid):
     return vsize
 
 #Sampling function using psutil
-def measure_memory_usage(pid):
+def measure_memory(pid):
     # Obtenir des informations sur l'utilisation de la mémoire du processus
     process = psutil.Process(pid)
     mem_info = process.memory_info()
@@ -103,14 +101,13 @@ if fork_pid == 0:
     pgid = os.getpgid(pid)
     log("Post-session init: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
         
-    log("Starting child: {}".format(child_command))
+    log("Starting child: {}".format(child_args))
     proc = Popen(child_args, stdin=None, stdout=None, stderr=None, env=None, shell=True)
 
     # Logging peak memory usage 
     vmpeak = -1
     while proc.returncode == None:
-        size = measure_memory_usage(proc.pid)
-        vmpeak = max(size, vmpeak)
+        vmpeak = max(measure_memory(proc.pid), vmpeak)
         log("Waiting for child to exit. vmpeak={}".format(vmpeak))
         proc.poll()     # Check if child process has finished
         #time.sleep(0.1) # Time in seconds (float)

@@ -1,11 +1,10 @@
 #include <iostream>
-#include <vector>
-#include <unistd.h>
+//#include <unistd.h>
 
 int main() {
     
     // Allocation de 100Mo de mémoire virtuelle
-    char* alloc = (char*) malloc(200 * 1024 * 1024);
+    char* alloc = (char*) malloc(100 * 1024 * 1024);
 
     // Utilisation de 25 Mo de mémoire 
     for(int i = 0; i < 25 * 1024 * 1024 ; i++) {
@@ -13,7 +12,7 @@ int main() {
     }
 
     // Libération de la mémoire
-    sleep(1);
+    //sleep(1);
     free(alloc);
 
     return 0;
