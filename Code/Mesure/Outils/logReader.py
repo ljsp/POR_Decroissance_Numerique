@@ -12,7 +12,6 @@ max_vss = 0
 
 prev_brk_alloc = 0
 prev_vss = 0
-prev_time = time.time()
 
 with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
     for line in f:
@@ -39,27 +38,23 @@ with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
                     current_vss += alloc - prev_brk_alloc
                     prev_brk_alloc = alloc
         
-        if vss_data:
-            prev_vss = vss_data[-1]
-            
         if current_vss > max_vss:
             max_vss = current_vss
+            
+        if vss_data:
+            prev_vss = vss_data[-1]
 
         vss_data.append(prev_vss)
         vss_data.append(current_vss)
         
-        time_data.append(clock - 1.0e-19)
+        clock += abs(current_vss - prev_vss)
         time_data.append(clock)
-        
-        current_time = time.time()
-        elapsed_time = current_time - prev_time
-        prev_time = current_time
-        clock += abs(current_vss - prev_vss) / elapsed_time
+        time_data.append(clock)
         
 # tracé du graphe en utilisant matplotlib
 print("VSS peak : ", max_vss)
 plt.plot(time_data, vss_data, label='VSS')
-plt.xlabel('Temps (en octets/secondes)')
+plt.xlabel('Temps (en octets/par allocations)')
 plt.ylabel('Utilisation de la mémoire (en octets)')
 plt.title('Evolution de l\'utilisation de la mémoire au cours du temps')
 plt.legend()
