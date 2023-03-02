@@ -50,8 +50,11 @@ def launchCommandFor(nbBytes, command):
     return res
 
 if __name__ == "__main__":
-    # python3 script.py "<command>" memMin memMax precision
-    # all in bytes 
+    # python3 script.py "command" memMin memMax precision
+    # all in bytes
+    # sudo password will be ask
+    # example : python3 test_base/script.py "python3 test_base/python/code/void.py" 1000000 5000000 100000
+    # return an interval of the max memory value
     try:
         assert len(sys.argv) == 5
         command = str(sys.argv[1])
