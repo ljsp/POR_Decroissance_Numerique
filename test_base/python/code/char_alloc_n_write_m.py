@@ -9,12 +9,8 @@ if __name__ == "__main__":
 
     if n < 0:
         exit(2)
-    
-    #print(n)
 
     p = array.array('i', (0 for i in range(0, n)))
-
-    #print("alloc done")
 
     if len(sys.argv) == 3:
         m = int(sys.argv[2])
@@ -26,7 +22,5 @@ if __name__ == "__main__":
         
         for i in range(m):
             p[i] = 8
-        
-        #print("write done")
     
     exit(0)
