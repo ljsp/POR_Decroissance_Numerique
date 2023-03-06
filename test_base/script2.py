@@ -20,7 +20,7 @@ def launchCommandFor(command):
     return res
 
 if __name__ == "__main__":
-    # python3 script.py "command"
+    # python3 script2.py "command"
     # sudo password will be ask
     # example : python3 test_base/script.py "python3 test_base/python/code/void.py" 24000000
     # return the cgroup peak
