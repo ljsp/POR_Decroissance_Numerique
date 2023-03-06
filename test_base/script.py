@@ -1,34 +1,6 @@
 import sys
 import subprocess
 
-def launchCommandForDev(nbBytes, command):
-    #footer = " > /dev/null"
-    cmdCreate = "sudo cgcreate -g memory:" + str(nbBytes)
-    cmdSetMax = "echo \"" + str(nbBytes) + "\" | sudo dd of=/sys/fs/cgroup/" + str(nbBytes) + "/memory.max"
-    cmdSetSwapMax = "echo \"" + str(0) + "\" | sudo dd of=/sys/fs/cgroup/" + str(nbBytes) + "/memory.swap.max"
-    cmdExec = "sudo cgexec -g memory:" + str(nbBytes) + " " + command
-    cmdDelete = "sudo cgdelete -g memory:" + str(nbBytes)
-
-    subprocess.run(cmdCreate, shell=True)
-    #print("created")
-    subprocess.run(cmdSetMax, shell=True)
-    #print("set max")
-    subprocess.run(cmdSetSwapMax, shell=True)
-    #print("set swap max")
-    #print("begin running")
-    subprocess.run(cmdExec, shell=True)
-    #print("end running")
-
-    res = -1
-    with open("/sys/fs/cgroup/" + str(nbBytes) + "/memory.events", "r") as f:
-        res = int(f.readlines()[2].split(" ")[1][:-1])
-    #print("read value")
-    
-    subprocess.run(cmdDelete, shell=True)
-    #print("deleted")
-
-    return res
-
 def launchCommandFor(nbBytes, command):
     cmdCreate = "sudo cgcreate -g memory:" + str(nbBytes)
     cmdSetMax = "echo \"" + str(nbBytes) + "\" | sudo dd of=/sys/fs/cgroup/" + str(nbBytes) + "/memory.max"
@@ -61,7 +33,7 @@ if __name__ == "__main__":
         memMin = int(sys.argv[2])
         memMax = int(sys.argv[3])
         precision = int(sys.argv[4])
-        assert memMin >= 50_000 and memMax <= 4_000_000_000 and precision >= 10_000
+        assert memMin >= 50_000 and memMax <= 4_000_000_000 and precision >= 1_024
         assert memMin + precision <= memMax
     except:
         print("Abort args")
@@ -100,4 +72,4 @@ if __name__ == "__main__":
             memMax = nextVal
         count += 1
 
-    print("Solution is between " + str(memMax) + " and " + str(memMin))
+    print("Result is between " + str(memMax) + " and " + str(memMin))
