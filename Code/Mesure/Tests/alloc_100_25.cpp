@@ -1,5 +1,4 @@
 #include <iostream>
-//#include <unistd.h>
 
 int main() {
     
@@ -12,7 +11,6 @@ int main() {
     }
 
     // Libération de la mémoire
-    //sleep(1);
     free(alloc);
 
     return 0;

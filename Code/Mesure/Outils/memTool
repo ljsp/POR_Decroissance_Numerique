@@ -31,8 +31,6 @@ while i < len(sys.argv):
         child_args.append(sys.argv[i])
     i += 1
 
-#child_command = ' '.join(child_args)
-
 def log(msg):
     if DEBUG:
         print("memTool: {}".format(msg))
@@ -41,38 +39,34 @@ def log(msg):
 
 log(child_args)
 
-#Sampling function using ps
-def get_vsize(pid):
-    vsize = 0
-    proc = Popen(['ps', '-o', 'vsize=', '--pid', str(pid)], stdout=PIPE, stderr=None, shell=False)
-    (stdout, _stderr) = proc.communicate()
-    print(stdout)
-    print(sid)
-    # Sum the size of each 
-    for line in stdout.split():
-        vsize += int(line.strip())
-    return vsize
-
-#Sampling function using psutil
+#Sampling function
 def measure_memory(pid):
     # Obtenir des informations sur l'utilisation de la mémoire du processus
     process = psutil.Process(pid)
     mem_info = process.memory_info()
+    log("\n\n####### Process infos #######")
     log("Process pid is : {}".format(pid))
     log("Process mem is : {}".format(mem_info))
-    vms = mem_info.vms
+    log("Process command line is : {}".format(process.cmdline()))
+    vss = mem_info.vms
+    rss = mem_info.rss
 
     # List of all process forks
     forks = process.children(recursive=True)
 
     # For each fork, add its memory
+    log("\n\n####### Child infos #######")
     for fork in forks:
-        fork_mem_info = fork.memory_info()
-        log("Child pid is {}".format(fork.pid))
-        log("Child mem is {}".format(fork_mem_info)) 
-        vms += fork_mem_info.vms
+            assert fork.pid != fork.ppid()
+            fork_mem_info = fork.memory_info()
+            log("Child pid is {}".format(fork.pid))
+            log("Child mem is {}".format(fork_mem_info))
+            log("Child command line is : {}".format(fork.cmdline()))
+            #log("Child Random infos : ppid {}, name {}, exe {}, cmdline {} ".format(fork.ppid(), fork.name(), fork.exe(), fork.cmdline())) 
+            vss += fork_mem_info.vms
+            rss += fork_mem_info.rss
 
-    return vms
+    return vss, rss
 
 # Parent process infos
 pid = os.getpid()
@@ -102,17 +96,23 @@ if fork_pid == 0:
     log("Post-session init: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
         
     log("Starting child: {}".format(child_args))
-    proc = Popen(child_args, stdin=None, stdout=None, stderr=None, env=None, shell=True)
+    proc = psutil.Popen(child_args, stdin=None, stdout=None, stderr=None, env=None, shell=True)
 
     # Logging peak memory usage 
-    vmpeak = -1
+    vss_peak = -1
+    rss_peak = -1
+    exec_count = 0
     while proc.returncode == None:
-        vmpeak = max(measure_memory(proc.pid), vmpeak)
-        log("Waiting for child to exit. vmpeak={}".format(vmpeak))
+        current_vss, current_rss = measure_memory(proc.pid)
+        vss_peak = max(current_vss, vss_peak)
+        rss_peak = max(current_rss, rss_peak)
+        log("Waiting for child to exit. VSS Peak={} RSS Peak={} ".format(vss_peak,rss_peak))
+        exec_count += 1
         proc.poll()     # Check if child process has finished
         #time.sleep(0.1) # Time in seconds (float)
-    
-    out.write("memTool: vmpeak: {} \n".format(vmpeak))
+    out.write("Execution nb: {} \n".format(exec_count))
+    out.write("memTool: VSS Peak: {} \n".format(vss_peak))
+    out.write("memTool: RSS Peak: {} \n".format(rss_peak))
 
     status = proc.returncode
     log("Child process returned {}".format(status))
@@ -129,5 +129,4 @@ else:
         executionTime = (time.time() - startTime)
         out.write("Execution time : {} s\n".format(executionTime))
     out.close()
-    
     sys.exit(status)

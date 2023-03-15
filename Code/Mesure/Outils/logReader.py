@@ -23,7 +23,8 @@ with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
         elif "munmap(" in line:
             match = line.split(",")
             match = match[1].split(")")
-            current_vss -= int(match[0]) # si une taille est trouvée, on la retire de la somme actuelle de VSS
+            match = match[0].split(" ")
+            current_vss -= int(match[1]) # si une taille est trouvée, on la retire de la somme actuelle de VSS
             
         elif "sbrk(" in line:
             raise Exception("Unexpected sbrk call")

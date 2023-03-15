@@ -2,33 +2,47 @@
 
 if [ "$1" = "memTool" ]; then
 
-  g++ Tests/$2.cpp -o compiled_file
+  if [ "$2" = "cpp" ]; then 
 
-  python3 Outils/memTool ./compiled_file
+    g++ Tests/$3.cpp -o compiled_file
 
-  rm compiled_file
+    python3 Outils/memTool ./compiled_file
+
+    rm compiled_file
+
+  elif [ "$2" = "python" ]; then
+  
+    python3 Outils/memTool "python3 Tests/$3.py"
+
+  else
+
+    echo "Error : unknown file type"
+  
+  fi
 
 elif [ "$1" = "logReader" ]; then
 
-  g++ Tests/$2.cpp -o compiled_file
+  if [ "$2" = "cpp" ]; then 
 
-  strace -e trace=memory -f -o trace.log ./compiled_file
+    g++ Tests/$3.cpp -o compiled_file
+    strace -e trace=memory -f -o trace.log ./compiled_file
+    # --status=successful,failed 
+    rm compiled_file
+  
+  elif [ "$2" = "python" ]; then
 
-  rm compiled_file
+    strace -e trace=memory -f -o trace.log python3 Tests/$3.py
+
+  else 
+
+    echo "Error : unknown file type"
+  
+  fi
 
   python3 Outils/logReader.py
-
-  rm trace.log
-
-elif [ "$1" = "alloc-write-start" ]; then
-
-  strace -e trace=memory -f -o trace.log ./Outils/alloc-write-start.sh $2 $3
-
-  python3 Outils/logReader.py
-
+  
   rm trace.log
 
 else
-  # sinon, on affiche un message d'erreur
   echo "Error: Invalid argument."
 fi
