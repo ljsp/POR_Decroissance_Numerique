@@ -52,7 +52,7 @@ with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
         time_data.append(clock)
         
 # tracé du graphe en utilisant matplotlib
-print("VSS peak : ", max_vss)
+print("VSS peak : {:.1f} Mo".format(max_vss / 1000000))
 plt.plot(time_data, vss_data, label='VSS')
 plt.xlabel('Temps (en octets/par allocations)')
 plt.ylabel('Utilisation de la mémoire (en octets)')

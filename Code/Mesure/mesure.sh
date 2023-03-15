@@ -14,6 +14,10 @@ if [ "$1" = "memTool" ]; then
   
     python3 Outils/memTool -t "python3 Tests/$3.py"
 
+  elif [ "$2" = "exe" ]; then
+
+    python3 Outils/memTool ./Tests/$3
+
   else
 
     echo "Error : unknown file type"
@@ -32,6 +36,10 @@ elif [ "$1" = "logReader" ]; then
   elif [ "$2" = "python" ]; then
 
     strace -e trace=memory -f -o trace.log python3 Tests/$3.py
+
+  elif [ "$2" = "exe" ]; then
+
+    strace -e trace=memory -f -o trace.log ./Tests/$3
 
   else 
 

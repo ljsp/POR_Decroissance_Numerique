@@ -18,6 +18,13 @@ vss_peak = -1
 rss_peak = -1
 exec_count = 0
 
+clock = 0
+vss_data = []
+rss_data = []
+time_data = []
+prev_vss = 0
+prev_rss = 0
+
 child_args = []
 i = 1
 while i < len(sys.argv):
@@ -76,6 +83,23 @@ while proc.returncode == None:
     rss_peak = max(current_rss, rss_peak)
     log("Waiting for child to exit. VSS Peak={} RSS Peak={} ".format(vss_peak,rss_peak))
     exec_count += 1
+    
+    if vss_data:
+        prev_vss = vss_data[-1]
+
+    if rss_data:
+        prev_rss = rss_data[-1]
+
+    vss_data.append(prev_vss)
+    vss_data.append(current_vss)
+
+    rss_data.append(prev_rss)
+    rss_data.append(current_rss)
+    
+    clock += abs(current_vss - prev_vss)
+    time_data.append(clock)
+    time_data.append(clock)
+    
     proc.poll()     # Check if child process has finished
     
 out.write("memTool: VSS Peak: {:.1f} Mo\n".format(vss_peak / 1000000))
@@ -86,5 +110,14 @@ if TIMER:
 
 status = proc.returncode
 log("Child process returned {}".format(status))
+
+# tracé du graphe en utilisant matplotlib
+plt.plot(time_data, vss_data, label='VSS')
+plt.plot(time_data, rss_data, label='RSS')
+plt.xlabel('Temps (en octets/par allocations)')
+plt.ylabel('Utilisation de la mémoire (en octets)')
+plt.title('Evolution de l\'utilisation de la mémoire au cours du temps')
+plt.legend()
+plt.show()
 
 sys.exit(status)
