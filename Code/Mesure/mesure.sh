@@ -12,7 +12,7 @@ if [ "$1" = "memTool" ]; then
 
   elif [ "$2" = "python" ]; then
   
-    python3 Outils/memTool "python3 Tests/$3.py"
+    python3 Outils/memTool -t "python3 Tests/$3.py"
 
   else
 

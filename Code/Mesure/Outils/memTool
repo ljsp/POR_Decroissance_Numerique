@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import sys
-import os
 import time
 from subprocess import *
 import psutil
@@ -15,7 +14,10 @@ FILE = False
 DEBUG = False
 TIMER = False
 
-## Parsing args
+vss_peak = -1
+rss_peak = -1
+exec_count = 0
+
 child_args = []
 i = 1
 while i < len(sys.argv):
@@ -39,94 +41,50 @@ def log(msg):
 
 log(child_args)
 
-#Sampling function
 def measure_memory(pid):
-    # Obtenir des informations sur l'utilisation de la mémoire du processus
     process = psutil.Process(pid)
     mem_info = process.memory_info()
-    log("\n\n####### Process infos #######")
+    log("\n\n ####### Process infos #######")
     log("Process pid is : {}".format(pid))
     log("Process mem is : {}".format(mem_info))
     log("Process command line is : {}".format(process.cmdline()))
     vss = mem_info.vms
     rss = mem_info.rss
 
-    # List of all process forks
+    log("\n\n ####### Child infos #######")
     forks = process.children(recursive=True)
-
-    # For each fork, add its memory
-    log("\n\n####### Child infos #######")
     for fork in forks:
             assert fork.pid != fork.ppid()
             fork_mem_info = fork.memory_info()
             log("Child pid is {}".format(fork.pid))
             log("Child mem is {}".format(fork_mem_info))
             log("Child command line is : {}".format(fork.cmdline()))
-            #log("Child Random infos : ppid {}, name {}, exe {}, cmdline {} ".format(fork.ppid(), fork.name(), fork.exe(), fork.cmdline())) 
             vss += fork_mem_info.vms
             rss += fork_mem_info.rss
 
     return vss, rss
 
-# Parent process infos
-pid = os.getpid()
-sid = os.getsid(pid)
-pgid = os.getpgid(pid)
-log("Pre-fork: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
+log("Starting child: {}".format(child_args))
+proc = psutil.Popen(child_args, stdin=None, stdout=None, stderr=None, env=None, shell=True)
 
-# Starting time for execution time
-if TIMER:
-    startTime = time.time()
+if TIMER: 
+    start_time = proc.create_time()
 
-# Creating child process to execute child command
-fork_pid = os.fork()
-
-# We are in the child process
-if fork_pid == 0:  
-    # Setting up child process
-    pid = os.getpid()
-    sid = os.getsid(pid)
-    pgid = os.getpgid(pid)
-    log("Post-fork: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
-
-    log("Trying to init our own session".format(pid, pgid))
-    os.setsid()
-    sid = os.getsid(pid)
-    pgid = os.getpgid(pid)
-    log("Post-session init: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
-        
-    log("Starting child: {}".format(child_args))
-    proc = psutil.Popen(child_args, stdin=None, stdout=None, stderr=None, env=None, shell=True)
-
-    # Logging peak memory usage 
-    vss_peak = -1
-    rss_peak = -1
-    exec_count = 0
-    while proc.returncode == None:
-        current_vss, current_rss = measure_memory(proc.pid)
-        vss_peak = max(current_vss, vss_peak)
-        rss_peak = max(current_rss, rss_peak)
-        log("Waiting for child to exit. VSS Peak={} RSS Peak={} ".format(vss_peak,rss_peak))
-        exec_count += 1
-        proc.poll()     # Check if child process has finished
-        #time.sleep(0.1) # Time in seconds (float)
-    out.write("Execution nb: {} \n".format(exec_count))
-    out.write("memTool: VSS Peak: {} \n".format(vss_peak))
-    out.write("memTool: RSS Peak: {} \n".format(rss_peak))
-
-    status = proc.returncode
-    log("Child process returned {}".format(status))
+while proc.returncode == None:
+    current_vss, current_rss = measure_memory(proc.pid)
+    vss_peak = max(current_vss, vss_peak)
+    rss_peak = max(current_rss, rss_peak)
+    log("Waiting for child to exit. VSS Peak={} RSS Peak={} ".format(vss_peak,rss_peak))
+    exec_count += 1
+    proc.poll()     # Check if child process has finished
     
-    sys.exit(status)
+out.write("memTool: VSS Peak: {:.1f} Mo\n".format(vss_peak / 1000000))
+out.write("memTool: RSS Peak: {:.1f} Mo\n".format(rss_peak / 1000000))
+out.write("memTool: Number of samples : {} \n".format(exec_count))
+if TIMER:
+    out.write("memTool: Execution time: {:.1f} s\n".format(time.time() - start_time))
 
-# We are in parent process
-else:
-    # Wait for child process to finish
-    (_fork_pid, full_status) = os.waitpid(fork_pid, 0)
-    status = full_status >> 8
-    log("Fork returned {}".format(status))
-    if TIMER:
-        executionTime = (time.time() - startTime)
-        out.write("Execution time : {} s\n".format(executionTime))
-    out.close()
-    sys.exit(status)
+status = proc.returncode
+log("Child process returned {}".format(status))
+
+sys.exit(status)
