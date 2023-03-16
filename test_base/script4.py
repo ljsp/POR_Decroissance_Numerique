@@ -47,5 +47,5 @@ if __name__ == "__main__":
     Yjava = [launchCommandFor(pathJava + str(i)) for i in X]
     Ypython = [launchCommandFor(pathPython + str(i)) for i in X]
 
-    plt.plot(X, Yc, 'black', X, Ycpp, 'b', X, Yjava, 'r', X, Ypython, 'g')
+    plt.loglog(X, Yc, 'black', X, Ycpp, 'b', X, Yjava, 'r', X, Ypython, 'g')
     plt.show()
