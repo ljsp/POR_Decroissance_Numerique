@@ -1,7 +1,6 @@
 
 import matplotlib.pyplot as plt
 import re
-import time
 
 clock = 0
 vss_data = []
@@ -18,12 +17,13 @@ with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
         
         if "mmap(" in line: # vérification si la ligne contient un appel mmap
             match = line.split(",")
-            current_vss += int(match[1]) # si une taille est trouvée, on l'ajoute à la somme actuelle de VSS
+            current_vss += int(match[1])
       
         elif "munmap(" in line:
             match = line.split(",")
             match = match[1].split(")")
-            current_vss -= int(match[0]) # si une taille est trouvée, on la retire de la somme actuelle de VSS
+            match = match[0].split(" ")
+            current_vss -= int(match[1])
             
         elif "sbrk(" in line:
             raise Exception("Unexpected sbrk call")
@@ -52,7 +52,7 @@ with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
         time_data.append(clock)
         
 # tracé du graphe en utilisant matplotlib
-print("VSS peak : ", max_vss)
+print("VSS peak : {:.1f} Mo".format(max_vss / 1000000))
 plt.plot(time_data, vss_data, label='VSS')
 plt.xlabel('Temps (en octets/par allocations)')
 plt.ylabel('Utilisation de la mémoire (en octets)')
