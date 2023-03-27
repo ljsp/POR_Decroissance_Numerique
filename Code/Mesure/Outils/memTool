@@ -49,25 +49,30 @@ def log(msg):
 log(child_args)
 
 def measure_memory(pid):
-    process = psutil.Process(pid)
-    mem_info = process.memory_info()
-    log("\n\n ####### Process infos #######")
-    log("Process pid is : {}".format(pid))
-    log("Process mem is : {}".format(mem_info))
-    log("Process command line is : {}".format(process.cmdline()))
-    vss = mem_info.vms
-    rss = mem_info.rss
+    try:
+        process = psutil.Process(pid)
+        mem_info = process.memory_info()
+        log("\n\n ####### Process infos #######")
+        log("Process pid is : {}".format(pid))
+        log("Process mem is : {}".format(mem_info))
+        log("Process command line is : {}".format(process.cmdline()))
+        vss = mem_info.vms
+        rss = mem_info.rss
 
-    log("\n\n ####### Child infos #######")
-    forks = process.children(recursive=True)
-    for fork in forks:
-            assert fork.pid != fork.ppid()
-            fork_mem_info = fork.memory_info()
-            log("Child pid is {}".format(fork.pid))
-            log("Child mem is {}".format(fork_mem_info))
-            log("Child command line is : {}".format(fork.cmdline()))
-            vss += fork_mem_info.vms
-            rss += fork_mem_info.rss
+        log("\n\n ####### Child infos #######")
+        forks = process.children(recursive=True)
+        for fork in forks:
+                assert fork.pid != fork.ppid()
+                fork_mem_info = fork.memory_info()
+                log("Child pid is {}".format(fork.pid))
+                log("Child mem is {}".format(fork_mem_info))
+                log("Child command line is : {}".format(fork.cmdline()))
+                vss += fork_mem_info.vms
+                rss += fork_mem_info.rss
+    
+    except psutil.NoSuchProcess:
+        log("Process or child process no longer exists (pid={})".format(pid))
+        vss, rss = 0, 0
 
     return vss, rss
 

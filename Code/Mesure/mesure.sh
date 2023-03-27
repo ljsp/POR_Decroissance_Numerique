@@ -16,7 +16,7 @@ if [ "$1" = "memTool" ]; then
 
   elif [ "$2" = "exe" ]; then
 
-    python3 Outils/memTool ./Tests/$3
+    python3 Outils/memTool $3
 
   else
 
@@ -39,7 +39,7 @@ elif [ "$1" = "logReader" ]; then
 
   elif [ "$2" = "exe" ]; then
 
-    strace -e trace=memory -f -o trace.log ./Tests/$3
+    strace -e trace=memory -f -o trace.log $3
 
   else 
 
