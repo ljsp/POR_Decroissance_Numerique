@@ -1,56 +1,59 @@
 #!/bin/bash
 
-if [ "$1" = "memTool" ]; then
+if [[ $# -ne 2 ]]; then
+    echo "Invalid number of arguments"
+    echo "Usage: $0 <memTool|logReader> <file_path>"
+    exit 1 
+fi
 
-  if [ "$2" = "cpp" ]; then 
+tool="$1"
+file_path="$2"
+extension="${file_path##*.}"
+file_name="${file_path%.*}"
 
-    g++ Tests/$3.cpp -o compiled_file
+if [ "$extension" = "$file_path" ]; then
+    extension="no_extension"
+fi
 
-    python3 Outils/memTool ./compiled_file
+if [ $tool = "memTool" ]; then
 
-    rm compiled_file
+    if [ $extension = "cpp" ]; then
+        g++ $file_path -o compiled_file
+        python3 memTool ./compiled_file
+        rm compiled_file
 
-  elif [ "$2" = "python" ]; then
-  
-    python3 Outils/memTool -t "python3 Tests/$3.py"
+    elif [ $extension = "py" ]; then
+        python3 memTool python3 $file_path
 
-  elif [ "$2" = "exe" ]; then
+    elif [ $extension = "no_extension" ]; then
+        python3 memTool $file_path
 
-    python3 Outils/memTool $3
+    else
+        echo "Error : unknown file type"
 
-  else
+    fi
 
-    echo "Error : unknown file type"
-  
-  fi
+elif [ $tool = "logReader" ]; then
 
-elif [ "$1" = "logReader" ]; then
+    if [ $extension = "cpp" ]; then
+        g++ $file_path -o compiled_file
+        strace -e trace=memory -f -o trace.log ./compiled_file
+        rm compiled_file
 
-  if [ "$2" = "cpp" ]; then 
+    elif [ $extension = "py" ]; then
+        strace -e trace=memory -f -o trace.log python3 $file_path
 
-    g++ Tests/$3.cpp -o compiled_file
-    strace -e trace=memory -f -o trace.log ./compiled_file
-    # --status=successful,failed 
-    rm compiled_file
-  
-  elif [ "$2" = "python" ]; then
+    elif [ $extension = "no_extension" ]; then
+        strace -e trace=memory -f -o trace.log $file_path
 
-    strace -e trace=memory -f -o trace.log python3 Tests/$3.py
+    else
+        echo "Error : unknown file type"
 
-  elif [ "$2" = "exe" ]; then
+    fi
 
-    strace -e trace=memory -f -o trace.log $3
-
-  else 
-
-    echo "Error : unknown file type"
-  
-  fi
-
-  python3 Outils/logReader.py
-  
-  rm trace.log
+    python3 logReader.py
+    rm trace.log
 
 else
-  echo "Error: Invalid argument."
+    echo "Error: Invalid argument."
 fi

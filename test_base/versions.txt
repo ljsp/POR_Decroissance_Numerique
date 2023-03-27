@@ -1,4 +1,0 @@
-C : gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0
-C++ : g++ (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0
-Python : Python 3.10.6
-Java : openjdk 17.0.5 2022-10-18, OpenJDK Runtime Environment (build 17.0.5+8-Ubuntu-2ubuntu122.04)

@@ -1,0 +1,10 @@
+Choix des langages avec leur compilateurs pour unix :
+- Java : openjdk 17.0.5 2022-10-18, OpenJDK Runtime Environment (build 17.0.5+8-Ubuntu-2ubuntu122.04)
+- Python : Python 3.10.6
+- C : gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0
+- C++ : g++ (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0
+- C# : .NET ~4
+- Rust : ...
+- Forth : ...
+- HTML/CSS : google chrome
+- Javascript : google chrome
