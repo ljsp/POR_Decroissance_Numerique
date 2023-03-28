@@ -1,12 +1,22 @@
 #!/bin/bash
 
+tool="$1"
+
+if [ $tool = "cgroup" ]; then
+    gcc ../Tests/C/char_alloc_n_write_m.c -o ../Tests/C/c_char_alloc_n_write_m
+    g++ ../Tests/C++/char_alloc_n_write_m.cpp -o ../Tests/C++/cpp_char_alloc_n_write_m 
+    python3 script3.py $2 $3 $4
+    rm ../Tests/C/c_char_alloc_n_write_m
+    rm ../Tests/C++/cpp_char_alloc_n_write_m 
+fi
+
 if [[ $# -ne 2 ]]; then
     echo "Invalid number of arguments"
     echo "Usage: $0 <memTool|logReader> <file_path>"
     exit 1 
 fi
 
-tool="$1"
+
 file_path="$2"
 extension="${file_path##*.}"
 file_name="${file_path%.*}"

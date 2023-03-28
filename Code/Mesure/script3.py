@@ -37,10 +37,10 @@ if __name__ == "__main__":
         print("Abort args")
         exit(1)
 
-    pathC = "c/exe/char_alloc_n_write_m "
-    pathCpp = "c++/exe/char_alloc_n_write_m "
-    pathJava = "java char_alloc_n_write_m "
-    pathPython = "python3 python/code/char_alloc_n_write_m.py "
+    pathC = "../Tests/C/c_char_alloc_n_write_m "
+    pathCpp = "../Tests/C++/cpp_char_alloc_n_write_m "
+    pathJava = "java ../Tests/Java/char_alloc_n_write_m.java "
+    pathPython = "python3 ../Tests/Python/char_alloc_n_write_m.py "
     
     X = [i for i in range(minX, maxX + 1, pas)]
     Yc = [launchCommandFor(pathC + str(i) + " 0") for i in X]
