@@ -21,10 +21,6 @@ file_path="$2"
 extension="${file_path##*.}"
 file_name="${file_path%.*}"
 
-if [ "$extension" = "$file_path" ]; then
-    extension="no_extension"
-fi
-
 if [ $tool = "memTool" ]; then
 
     if [ $extension = "cpp" ]; then
@@ -33,13 +29,10 @@ if [ $tool = "memTool" ]; then
         rm compiled_file
 
     elif [ $extension = "py" ]; then
-        python3 memTool python3 $file_path
-
-    elif [ $extension = "no_extension" ]; then
-        python3 memTool $file_path
+        python3 memTool "python3 $file_path"
 
     else
-        echo "Error : unknown file type"
+        python3 memTool $file_path
 
     fi
 
@@ -53,11 +46,8 @@ elif [ $tool = "logReader" ]; then
     elif [ $extension = "py" ]; then
         strace -e trace=memory -f -o trace.log python3 $file_path
 
-    elif [ $extension = "no_extension" ]; then
-        strace -e trace=memory -f -o trace.log $file_path
-
     else
-        echo "Error : unknown file type"
+        strace -e trace=memory -f -o trace.log $file_path
 
     fi
 
