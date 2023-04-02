@@ -21,8 +21,15 @@ Ce dépôt contient plusieurs outils de mesure de la mémoire pour analyser l'ut
 
 1. Clonez le dépôt :
 
+``` shell
 git clone https://github.com/ljsp/POR_Decroissance_Numerique.git
+```
+
+2. Accéder au répertoire des outils de mesure
+
+``` shell
 cd POR_Decroissance_Numerique/Code/Mesure/
+```
 
 ## Utilisation
 
@@ -30,7 +37,9 @@ cd POR_Decroissance_Numerique/Code/Mesure/
 
 Pour exécuter le script `mesure.sh`, fournissez le nom de l'outil souhaité en tant que premier argument, suivi de tout argument supplémentaire spécifique à l'outil. La syntaxe pour exécuter le script est :
 
-./mesure.sh <nom_de_loutil> <chemin_du_fichier>
+``` shell
+./mesure.sh <nom_de_loutil> <chemin_du_fichier|paramètres>
+```
 
 Par exemple :
 
@@ -38,10 +47,14 @@ Par exemple :
 
 Pour exécuter l'outil `cgroup`, utilisez la commande suivante :
 
+```shell
 ./mesure.sh cgroup <memoire_min> <memoire_max> <pas>
+```
 
 #### memTool && logReader 
 
 Pour exécuter l'outil `memTool`, utilisez la commande suivante :
 
+```shell
 ./mesure.sh <memTool|logReader> <chemin_du_fichier>
+```
