@@ -11,11 +11,15 @@ Ce dépôt contient plusieurs outils de mesure de la mémoire pour analyser l'ut
 ## Prérequis
 
 - Java openjdk 17.0.5
-- Python 3.10.6
 - Compilateurs GCC et G++ 11.3.0
-- Matplotlib
-- psutil
+- cgroup v2
 - strace
+- Python 3.10.6
+    - matplotlib
+    - psutil
+    - numpy
+    - pandas
+
 
 ## Installation
 
@@ -25,7 +29,7 @@ Ce dépôt contient plusieurs outils de mesure de la mémoire pour analyser l'ut
 git clone https://github.com/ljsp/POR_Decroissance_Numerique.git
 ```
 
-2. Accéder au répertoire des outils de mesure
+2. Accéder au répertoire des outils de mesure :
 
 ``` shell
 cd POR_Decroissance_Numerique/Code/Mesure/

@@ -1,6 +1,17 @@
 
 import matplotlib.pyplot as plt
 import re
+import sys
+import matplotlib.ticker as tkr  
+import pandas as pd
+
+def sizeof_fmt(x, pos):
+    if x < 0:
+        return ""
+    for x_unit in ['bytes', 'kB', 'MB', 'GB', 'TB']:
+        if x < 1024.0:
+            return "%3.1f %s" % (x, x_unit)
+        x /= 1024.0
 
 clock = 0
 vss_data = []
@@ -12,7 +23,12 @@ max_vss = 0
 prev_brk_alloc = 0
 prev_vss = 0
 
-with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
+trace = sys.argv[1]
+program_path = trace.split("/")
+program_name = program_path[-1].removesuffix(".log")
+
+with open(trace, "r") as f: # ouverture du fichier de log en mode lecture
+    
     for line in f:
         
         if "mmap(" in line: # vérification si la ligne contient un appel mmap
@@ -50,12 +66,14 @@ with open("trace.log", "r") as f: # ouverture du fichier de log en mode lecture
         clock += abs(current_vss - prev_vss)
         time_data.append(clock)
         time_data.append(clock)
-        
-# tracé du graphe en utilisant matplotlib
+
+# Graph
+df = pd.DataFrame(list(zip(time_data, vss_data)), columns=['Time', 'VSS'])
 print("VSS peak : {:.1f} Mo".format(max_vss / 1000000))
-plt.plot(time_data, vss_data, label='VSS')
+ax = df.plot(x='Time', y='VSS', label='VSS')
+ax.yaxis.set_major_formatter(tkr.FuncFormatter(sizeof_fmt))
 plt.xlabel('Temps (en octets/par allocations)')
 plt.ylabel('Utilisation de la mémoire (en octets)')
-plt.title('Evolution de l\'utilisation de la mémoire au cours du temps')
+plt.title('logReader : ' + program_name)
 plt.legend()
 plt.show()
