@@ -128,19 +128,28 @@ status = proc.returncode
 log("Child process returned {}".format(status))
 
 # Graph
+
 df = pd.DataFrame(list(zip(time_data, vss_data, rss_data)), columns=['Time', 'VSS', 'RSS'])
 
-ax = df.plot(x='Time', y='VSS', label='VSS', secondary_y="RSS")
+fig, ax = plt.subplots()
+
+ax.plot(df['Time'], df['RSS'], label='RSS', color='tab:orange')
+ax.set_xlabel('Temps (en octets/par allocations)')
+ax.set_ylabel('Utilisation de la mémoire RSS', color='tab:orange')
+ax.tick_params(axis='y', labelcolor='tab:orange')
 ax.yaxis.set_major_formatter(tkr.FuncFormatter(sizeof_fmt))
 
 ax1 = ax.twinx()
-df.plot(x='Time', y='RSS', label='RSS', color="orange", ax=ax1)
+ax1.plot(df['Time'], df['VSS'], label='VSS', color="tab:blue")
+ax1.set_ylabel('Utilisation de la mémoire VSS', color='tab:blue')
+ax1.tick_params(axis='y', labelcolor='tab:blue')
 ax1.yaxis.set_major_formatter(tkr.FuncFormatter(sizeof_fmt))
 
-plt.xlabel('Temps (en octets/par allocations)')
-plt.ylabel('Utilisation de la mémoire (en octets)')
+lines, labels = ax.get_legend_handles_labels()
+lines2, labels2 = ax1.get_legend_handles_labels()
+ax1.legend(lines + lines2, labels + labels2, loc=0)
+
 plt.title('memTool : ' + program_name[-1])
-plt.legend()
 plt.show()
 
 sys.exit(status)
