@@ -3,11 +3,26 @@
 tool="$1"
 
 if [ $tool = "cgroup" ]; then
-    gcc ../Tests/C/char_alloc_n_write_m.c -o ../Tests/C/c_char_alloc_n_write_m
-    g++ ../Tests/C++/char_alloc_n_write_m.cpp -o ../Tests/C++/cpp_char_alloc_n_write_m 
-    python3 script3.py $2 $3 $4
-    rm ../Tests/C/c_char_alloc_n_write_m
-    rm ../Tests/C++/cpp_char_alloc_n_write_m 
+    if [[ $# -le 3 ]]; then
+        echo "Invalid number of arguments"
+        echo "Usage: $0 cgroup <solo|multi> <command> <outputFileName> otherArgs..."
+        exit 1 
+    fi
+
+    if [ $2 = "solo" ]; then
+        python3 soloPeak.py $3
+
+    elif [ $2 = "multi" ]; then
+        args = ""
+        i = 3
+        while [ $i -le $#]
+            args = "${args} $i"
+        python3 multiPeaks.py ${args}
+    
+    else
+        echo "wrong args"
+    
+    fi
 fi
 
 if [[ $# -ne 2 ]]; then
@@ -15,7 +30,6 @@ if [[ $# -ne 2 ]]; then
     echo "Usage: $0 <memTool|logReader> <file_path>"
     exit 1 
 fi
-
 
 file_path="$2"
 extension="${file_path##*.}"
