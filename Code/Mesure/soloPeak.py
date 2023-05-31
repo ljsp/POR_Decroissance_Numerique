@@ -11,10 +11,31 @@ if __name__ == "__main__":
     # sudo password will be ask
     #
     # example :
-    # python3 soloPeak.py "gcc Tests/C++/char_alloc_n_write_m.cpp -o Tests/C++/char_alloc_n_write_m.exe" test1 5 -0
+    # python3 soloPeak.py "g++ ../Tests/C++/char_alloc_n_write_m.cpp -o ../Tests/C++/char_alloc_n_write_m.exe" test1 5 -o
     # python3 soloPeak.py -p "cd ../Tests/Java" "javac char_alloc_n_write_m.java" test2
 
     try:
+        for i in range(len(sys.argv)):
+            sys.argv[i] = sys.argv[i].strip()
+            if sys.argv[i][0] == "\"" and sys.argv[i][-1] == "\"":
+                sys.argv[i] = sys.argv[i][1:-1]
+        L = []
+        i = 0
+        while i < len(sys.argv):
+            if sys.argv[i][0] != "\"":
+                L.append(sys.argv[i])
+                i += 1
+            else:
+                s = sys.argv[i][1:]
+                j = i + 1
+                while sys.argv[j][-1] != "\"":
+                    s +=  " " + sys.argv[j]
+                    j += 1
+                s += " " + sys.argv[j][:-1]
+                i = j + 1
+                L.append(s)
+        sys.argv = L
+
         i = 1
 
         precommand = ""

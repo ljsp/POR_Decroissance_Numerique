@@ -13,9 +13,30 @@ if __name__ == "__main__":
     # if we assume that char_alloc_n_write_m.cpp and char_alloc_n_write_m.java are already compiled,
     # examples :
     # python3 multiPeaks.py "../Tests/C++/char_alloc_n_write_m.exe" test1 -o -c 1000000 -v 0 1000000 100000
-    # python3 multiPeaks.py -p "cd ../Tests/Java" "java ../Tests/Java/char_alloc_n_write_m" test2 3 -c 1000000 -v 0 1000000 200000
+    # python3 multiPeaks.py -p "cd ../Tests/Java" "java char_alloc_n_write_m" test2 3 -c 1000000 -v 0 1000000 200000
 
     try:
+        for i in range(len(sys.argv)):
+            sys.argv[i] = sys.argv[i].strip()
+            if sys.argv[i][0] == "\"" and sys.argv[i][-1] == "\"":
+                sys.argv[i] = sys.argv[i][1:-1]
+        L = []
+        i = 0
+        while i < len(sys.argv):
+            if sys.argv[i][0] != "\"":
+                L.append(sys.argv[i])
+                i += 1
+            else:
+                s = sys.argv[i][1:]
+                j = i + 1
+                while sys.argv[j][-1] != "\"":
+                    s +=  " " + sys.argv[j]
+                    j += 1
+                s += " " + sys.argv[j][:-1]
+                i = j + 1
+                L.append(s)
+        sys.argv = L
+
         i = 1
 
         precommand = ""
@@ -43,16 +64,19 @@ if __name__ == "__main__":
         nbParam = 0
         var = []
         nbVar = 0
+        L=[]
         while i < len(sys.argv):
             if sys.argv[i] == "-c":
                 l = [int(sys.argv[i + 1])]
                 parameters.append(l)
+                L.append(l)
                 i += 2
             else :
                 assert int(sys.argv[i + 1]) + int(sys.argv[i + 3]) <= int(sys.argv[i + 2])
                 assert int(sys.argv[i + 3]) >= 0
                 l = [j for j in range(int(sys.argv[i + 1]), int(sys.argv[i + 2]) + 1, int(sys.argv[i + 3]))]
                 parameters.append(l)
+                L.append([int(sys.argv[i + 1]), int(sys.argv[i + 2]), int(sys.argv[i + 3])])
                 i += 4
                 var.append(len(parameters) - 1)
                 nbVar += 1
@@ -62,7 +86,7 @@ if __name__ == "__main__":
         isVar = var[0]
         X = [parameters[i][0] for i in range(nbParam)]
         X2 = [0 for i in range(nbParam)]
-        Y = []
+        Y = [L]
     except:
         print("Error with args")
         exit(1)
@@ -72,14 +96,14 @@ if __name__ == "__main__":
         x = ""
         for i in X:
             x += str(i) + " "
-        x.strip()
+        x = x.strip()
 
         res = 0
         for i in range(nbTrials):
             res += launchCommandFor(command + " " + x, precommand=precommand, isOut=isOut)
         res = int(res / nbTrials)
 
-        Y.append(x + str(res))
+        Y.append(x + " " + str(res))
 
         if X2[isVar] < len(parameters[isVar]) - 1:
             X2[isVar] += 1
