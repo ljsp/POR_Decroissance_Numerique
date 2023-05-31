@@ -3,21 +3,19 @@
 tool="$1"
 
 if [ $tool = "cgroup" ]; then
-    if [[ $# -le 3 ]]; then
+    if [ $# -lt 4 ]; then
         echo "Invalid number of arguments"
         echo "Usage: $0 cgroup <solo|multi> <command> <outputFileName> otherArgs..."
         exit 1 
     fi
 
     if [ $2 = "solo" ]; then
-        python3 soloPeak.py $3
+        shift 2
+        python3 soloPeak.py $@
 
     elif [ $2 = "multi" ]; then
-        args = ""
-        i = 3
-        while [ $i -le $#]
-            args = "${args} $i"
-        python3 multiPeaks.py ${args}
+        shift 2
+        python3 multiPeaks.py $@
     
     else
         echo "wrong args"
