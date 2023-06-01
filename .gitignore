@@ -1,6 +1,4 @@
-*.class
 *.o
-*.exe
 
 draft.py
 test.txt
