@@ -11,6 +11,16 @@ def sizeof_fmt(x, pos):
         x /= 1024.0
 
 if __name__ == "__main__":
+
+    # Exec Alloc 100Mo Write 25Mo
+    # fig, ax = plt.subplots()
+    # x = ["C++"]
+    # y = [25341952]
+    # bar_colors = ['tab:purple']
+    # ax.bar(x, y, width=0.2, edgecolor="white", color=bar_colors)
+    # ax.yaxis.set_major_formatter(tkr.FuncFormatter(sizeof_fmt))
+    # ax.set_title('RSS used to alloc 100Mo and write 25Mo in C++')
+    # plt.show()
     
     # Compile helloworld
     # fig, ax = plt.subplots()
